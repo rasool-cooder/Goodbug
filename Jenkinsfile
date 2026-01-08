@@ -40,14 +40,15 @@ pipeline {
             }
         }
 
-        stage('Alembic Migration (Optional)') {
-            when {
-                expression { fileExists('alembic.ini') }
-            }
-            steps {
-                bat '''
-                %VENV%\\Scripts\\alembic.exe upgrade head || echo Alembic skipped
-                '''
+    stage('Alembic Migration (Optional)') {
+    steps {
+        bat '''
+        if exist alembic (
+            .venv\\Scripts\\alembic.exe upgrade head || echo "Alembic skipped"
+        ) else (
+            echo "Alembic not configured"
+        )
+        '''
             }
         }
 
