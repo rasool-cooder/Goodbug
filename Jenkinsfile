@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PYTHON = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe"
-        VENV = ".venv"
+        VENV   = ".venv"
     }
 
     stages {
@@ -40,15 +40,24 @@ pipeline {
             }
         }
 
-    stage('Alembic Migration (Optional)') {
-    steps {
-        bat '''
-        if exist alembic (
-            .venv\\Scripts\\alembic.exe upgrade head || echo "Alembic skipped"
-        ) else (
-            echo "Alembic not configured"
-        )
-        '''
+        stage('Alembic Migration (Optional)') {
+            steps {
+                script {
+                    def status = bat(
+                        script: """
+                        if exist alembic (
+                            %VENV%\\Scripts\\alembic.exe upgrade head
+                        ) else (
+                            echo Alembic not configured
+                        )
+                        """,
+                        returnStatus: true
+                    )
+
+                    if (status != 0) {
+                        echo "⚠️ Alembic skipped (DB not available in CI)"
+                    }
+                }
             }
         }
 
@@ -68,5 +77,6 @@ pipeline {
         }
     }
 }
+
 
 
