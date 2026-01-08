@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        VENV = "venv"
+        PYTHON = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe"
+        VENV = ".venv"
     }
 
     stages {
@@ -16,7 +17,7 @@ pipeline {
         stage('Create Virtual Environment') {
             steps {
                 bat '''
-                "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe" -m venv .venv
+                "%PYTHON%" -m venv %VENV%
                 '''
             }
         }
@@ -24,9 +25,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 bat '''
-                %VENV%\\Scripts\\activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
+                %VENV%\\Scripts\\python.exe -m pip install --upgrade pip
+                %VENV%\\Scripts\\python.exe -m pip install -r requirements.txt
                 '''
             }
         }
@@ -34,9 +34,8 @@ pipeline {
         stage('Basic Validation') {
             steps {
                 bat '''
-                %VENV%\\Scripts\\activate
-                python --version
-                pip list
+                %VENV%\\Scripts\\python.exe --version
+                %VENV%\\Scripts\\pip.exe list
                 '''
             }
         }
@@ -47,8 +46,7 @@ pipeline {
             }
             steps {
                 bat '''
-                %VENV%\\Scripts\\activate
-                alembic upgrade head || echo Alembic skipped
+                %VENV%\\Scripts\\alembic.exe upgrade head || echo Alembic skipped
                 '''
             }
         }
@@ -69,4 +67,5 @@ pipeline {
         }
     }
 }
+
 
